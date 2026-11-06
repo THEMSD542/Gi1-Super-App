@@ -21,11 +21,11 @@ var LINKS={
 };
 var CONTACT={name:"Gi1 Prime App",org:"Gi1 Super App",tel:"+917383958977",telShow:"73839 58977",mail:"info@gi1superapp.com",city:"Vadodara",country:"India"};
 /* The address the printed QR points to. Leave "" to use the address this page is opened from. */
-var PAGE_URL="https://claude.ai/artifact/TDnf37SE4GNu4zjnnQzN4t";
+var PAGE_URL="https://gi1superapp.github.io/Gi1-Super-App/";
 
 /* ---------- helpers ---------- */
 var $=function(i){return document.getElementById(i)};
-var body=document.body;if(!body.classList.contains("s-live")&&!body.classList.contains("s-land"))body.className="s-land f-front";
+var LITE=false;var body=document.body;if(!body.classList.contains("s-live")&&!body.classList.contains("s-land"))body.className="s-land f-front";
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function cv(w,h){var c=document.createElement("canvas");c.width=w;c.height=h;return c}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
@@ -107,7 +107,7 @@ function initGL(){
   if(glReady)return;
   try{renderer=new THREE.WebGLRenderer({canvas:$("gl"),antialias:(window.devicePixelRatio||1)<2,alpha:true,powerPreference:"high-performance"})}catch(e){glFail();return}
   $("gl").addEventListener("webglcontextlost",function(ev){ev.preventDefault();glFail()});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));renderer.setClearColor(0,0);
+  renderer.setPixelRatio(LITE?1:Math.min(window.devicePixelRatio||1,1.5));renderer.setClearColor(0,0);
   scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(FOV,1,.1,100);camera.position.z=CAMZ;
   scene.add(new THREE.AmbientLight(0xffffff,.85));var k=new THREE.DirectionalLight(0xffffff,.7);k.position.set(3,4,6);scene.add(k);
   var rim=new THREE.PointLight(0xffd36a,.9,30);rim.position.set(-5,-2,5);scene.add(rim);
@@ -190,7 +190,7 @@ function flip(){if(body.classList.contains("nogl")&&fbImg){fbFlip();return}tYaw=
   function size(){var d=1;W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d)}
   size();addEventListener("resize",size);
   for(var i=0;i<N;i++)P.push({x:Math.random(),y:Math.random(),r:5+Math.random()*9,v:.00012+Math.random()*.0004,p:Math.random()*6.3});
-  function frame(t){requestAnimationFrame(frame);if(document.hidden||fsOpen||body.classList.contains("ar")||t-last<33)return;last=t;
+  function frame(t){requestAnimationFrame(frame);if(document.hidden||fsOpen||LITE||body.classList.contains("ar")||t-last<33)return;last=t;
     g.clearRect(0,0,W,H);
     P.forEach(function(p){if(!still)p.y-=p.v*33;if(p.y<-.03){p.y=1.03;p.x=Math.random()}
       g.globalAlpha=.3+.7*Math.abs(Math.sin(t/900+p.p));var r=p.r;g.drawImage(spr,p.x*W-r,p.y*H-r,r*2,r*2)});g.globalAlpha=1}
@@ -212,7 +212,8 @@ function useFallback(){if(vFallback)return;vFallback=true;var im=$("vanim");im.s
 story.addEventListener("error",function(){
   if(vTried===0&&/^data:/.test(vsrc)){vTried=1;try{story.src=dataToBlobUrl(vsrc);story.load();if(live)tryPlay();return}catch(e){}}
   vTried=2;useFallback()});
-function loadVideo(){if(!story.getAttribute("src")){var c=navigator.connection||{},lite=story.getAttribute("data-lite");if(lite&&(c.saveData||/(^|-)(2g|3g)$/.test(c.effectiveType||"")))vsrc=lite;story.preload="auto";story.src=vsrc;story.load()}}
+var hdSrc=vsrc;/* full screen plays the 1080p file; the small panel plays the light 720p file (starts fast, lighter on the phone) */
+function loadVideo(){if(!story.getAttribute("src")){var lite=story.getAttribute("data-lite");if(lite)vsrc=lite;story.preload="auto";story.src=vsrc;story.load()}}
 function tryPlay(){if(vFallback)return;var p=story.play();if(p&&p.catch)p.catch(function(){syncPlayBtn()});setTimeout(syncPlayBtn,700)}
 function startVideo(){loadVideo();tryPlay()}
 /* if the browser still blocked autoplay, the first touch anywhere starts it */
@@ -222,7 +223,7 @@ $("vsnd").addEventListener("click",function(e){e.stopPropagation();story.muted=!
 document.querySelector(".vp").addEventListener("click",function(){if(!vFallback&&story.paused){tryPlay();return}openFS()});
 function openFS(){
   if(vFallback){$("fsv").hidden=true;var i=$("fsi");i.src=$("vanim").src;i.hidden=false;$("fs").hidden=false;fsOpen=true;return}
-  var f=$("fsv");$("fsi").hidden=true;f.hidden=false;f.src=story.currentSrc||story.getAttribute("src");f.currentTime=story.currentTime||0;$("fs").hidden=false;fsOpen=true;story.pause();f.muted=false;var p=f.play();if(p&&p.catch)p.catch(function(){f.muted=true;f.play().catch(function(){})})}
+  var f=$("fsv");$("fsi").hidden=true;f.hidden=false;var ct=story.currentTime||0;f.src=hdSrc||story.currentSrc||story.getAttribute("src");f.addEventListener("loadedmetadata",function mm(){f.removeEventListener("loadedmetadata",mm);try{f.currentTime=ct}catch(e){}});$("fs").hidden=false;fsOpen=true;story.pause();f.muted=false;var p=f.play();if(p&&p.catch)p.catch(function(){f.muted=true;f.play().catch(function(){})})}
 function closeFS(){var f=$("fsv");if(!vFallback){try{story.currentTime=f.currentTime}catch(e){}f.pause();f.removeAttribute("src");f.load()}$("fsi").hidden=true;$("fs").hidden=true;fsOpen=false;if(!vFallback)tryPlay()}
 $("fsx").addEventListener("click",closeFS);
 addEventListener("keydown",function(e){if(e.key==="Escape"){if(!$("sheet").hidden)closeSheet();else if(!$("fs").hidden)closeFS();else if(!$("studio").hidden)location.hash=""}});
@@ -295,7 +296,7 @@ function startTrack(){
   }).catch(function(e){trk.loading=false;try{if(trk.ctrl){trk.ctrl.stopProcessVideo&&trk.ctrl.stopProcessVideo()}}catch(er){}trk.ctrl=null;return false})}
 if(/[?&]debug\b/.test(location.search))window.__trk=trk;
 function trackSide(i){try{track(i===1?"track_back":"track_front")}catch(e){}}
-function stopTrack(){if(!trk.on&&!trk.loading)return;try{trk.ctrl&&trk.ctrl.stopProcessVideo&&trk.ctrl.stopProcessVideo()}catch(e){}trk.on=false;trk.ctrl=null;trk.found=false;body.classList.remove("trk");$("scanHint").hidden=true;if(renderer)renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));layoutGL()}
+function stopTrack(){if(!trk.on&&!trk.loading)return;try{trk.ctrl&&trk.ctrl.stopProcessVideo&&trk.ctrl.stopProcessVideo()}catch(e){}trk.on=false;trk.ctrl=null;trk.found=false;body.classList.remove("trk");$("scanHint").hidden=true;if(renderer)renderer.setPixelRatio(LITE?1:Math.min(window.devicePixelRatio||1,1.5));layoutGL()}
 function renderTrack(now){
   var s=now/1000;if(trk.anchor.visible){trk.fade=Math.min(1,trk.fade+.06);var k=1-Math.pow(1-trk.fade,3);trk.anchor.scale.setScalar(1);
     trk.coins.forEach(function(o,i){var a=i*Math.PI/2+s*.9;o.position.set(Math.cos(a)*.62,Math.sin(a)*.38,.07+Math.sin(a*2)*.02);o.rotation.y=s*2+i;o.scale.setScalar(Math.max(k,.001))})}
@@ -320,7 +321,7 @@ $("bar-ar").onclick=function(){
 /* ---------- landing -> experience ---------- */
 function start(){track("open");
   body.classList.remove("s-land");body.classList.add("s-live");
-  initGL();t0=performance.now();live=true;yaw=tYaw=-Math.PI*2;pitch=tPitch=.08;uScale=tUScale=1;idle=0;if(still)yaw=tYaw=0;
+  initGL();layoutGL();t0=performance.now();live=true;yaw=tYaw=-Math.PI*2;pitch=tPitch=.08;uScale=tUScale=1;idle=0;if(still)yaw=tYaw=0;
   setFace(true);body.classList.add("f-front");startVideo();
   setTimeout(function(){tYaw=0},30);
 }
@@ -387,6 +388,21 @@ if(/[?&]debug\b/.test(location.search))body.classList.add("debug");
 fillStatic();applyLang();
 (function waitLogo(){if(logoImg.complete&&logoImg.naturalWidth)paintMini();else logoImg.addEventListener("load",paintMini)})();
 studio();
-addEventListener("load",function(){setTimeout(loadVideo,200)});
+/* warm up while the landing screen is showing, so the tap on "Open" starts instantly:
+   3D scene + textures + shaders get ready, and the video starts buffering */
+function goLite(){if(LITE)return;LITE=true;body.classList.add("lite");if(renderer){renderer.setPixelRatio(1);layoutGL()}}
+function warm(){if(glReady||body.classList.contains("s-live"))return;initGL();if(glReady)setTimeout(function(){try{renderer.compile(scene,camera);renderer.render(scene,camera)}catch(e){}},1500)}
+function afterLoad(){loadVideo();setTimeout(warm,150)}
+if(document.readyState==="complete")afterLoad();else addEventListener("load",afterLoad);
+/* slow device? switch to the light mode by itself (no endless shine/drift animations, no sparkles, 1x sharpness) */
+(function(){
+  var m=navigator.deviceMemory,c=navigator.hardwareConcurrency;if((m&&m<=2)||(c&&c<=2))goLite();
+  var n=0,slow=0,last=0;
+  function f(t){if(LITE||n>=100)return;requestAnimationFrame(f);
+    if(!live||document.hidden||fsOpen||trk.on){last=0;return}
+    if(last){n++;if(t-last>36)slow++}last=t;
+    if(n===100&&slow>34)goLite()}
+  requestAnimationFrame(f);
+})();
 if(/[?&]go\b/.test(location.search)||location.hash==="#open")start();
 })();
