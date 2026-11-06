@@ -249,3 +249,8 @@ body.nogl #gl{display:none!important}
 body.trk #ui,body.trk .ribbon,body.trk #hud{display:none!important}
 body.trk #gl{pointer-events:auto}
 #scanHint{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 18px);transform:translateX(-50%);z-index:7;max-width:86%;text-align:center;padding:9px 16px;border-radius:22px;background:rgba(5,15,38,.86);border:1.5px solid #f0c24a;color:#ffe9a0;font-size:13px;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+
+/* light mode: switched on automatically on slow devices */
+body.lite *,body.lite *::before,body.lite *::after{animation-iteration-count:1!important}
+body.lite .panel>.in::after,body.lite .shine::after,body.lite #sparks{display:none!important}
+body.lite #badges span{animation:none!important;will-change:auto}
